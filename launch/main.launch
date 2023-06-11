@@ -1,0 +1,3 @@
+<launch>
+	<node pkg="uav" type="objectTracking.py" name="objectTracking" output="screen"/>
+</launch>
