@@ -16,12 +16,6 @@ def state_cb(msg):
     global current_state
     current_state = msg
 
-def signal_handler(sig, frame):
-    # Handle the interrupt signal (Ctrl+C)
-    print("Stopping")
-    stop_drone()
-
-signal.signal(signal.SIGINT, signal_handler)
 
 def callback(data):
     # Get pose data
@@ -35,29 +29,13 @@ def callback(data):
 
     # Create a Twist message and set the linear and angular velocities
     velocity_msg = TwistStamped()
-    velocity_msg.twist.linear.z = -1.0
+    velocity_msg.twist.linear.z = 1.0
 
     # Publish the velocity message repeatedly
     rate = rospy.Rate(10)  # 10 Hz
-    
-    while not rospy.is_shutdown():
-        velocity_msg.header.stamp = rospy.Time.now()
-        velocity_pub.publish(velocity_msg)
-        rospy.sleep(0.1)
-    else:
-        velocity_msg.twist.linear.x = 0.0
-        velocity_msg.twist.linear.y = 0.0
-        velocity_msg.twist.linear.z = 0.0
-        velocity_msg.header.stamp = rospy.Time.now()
-        velocity_pub.publish(velocity_msg)
-        print("Published stop")
-
-
-	# while not rospy.is_shutdown():
-	#     pose_msg.header.stamp = rospy.Time.now()
-	#     positionPub.publish(pose_msg)
-	#     rate = rospy.Rate(10)
-	#     rate.sleep()
+    velocity_msg.header.stamp = rospy.Time.now()
+    velocity_pub.publish(velocity_msg)
+    rate.sleep()
 
 def listener():
     rospy.init_node('listener', anonymous=True)
@@ -101,28 +79,16 @@ def arm():
 			print("Failed to arm")
 	else:
 		print("Failed to set mode to GUIDED")
-  
-def land():
-    set_mode_client = rospy.ServiceProxy('mavros/set_mode', SetMode)
-
-    # Create a SetModeRequest and set the custom mode to "AUTO.LAND"
-    land_mode = SetModeRequest()
-    land_mode.custom_mode = "AUTO.LAND"
-
-    # Call the set_mode service to command the drone to land
-    try:
-        response = set_mode_client(0, land_mode.custom_mode)
-        if response.mode_sent:
-            print("Drone is landing...")
-        else:
-            print("Failed to send landing command.")
-    except rospy.ServiceException as e:
-        print("Service call failed: ", str(e))
 
 def stop_drone():
     # Send a zero velocity command to stop the drone
     velocity_pub_2 = rospy.Publisher('/mavros/setpoint_velocity/cmd_vel', TwistStamped, queue_size=10)
     velocity_msg = TwistStamped()
+    velocity_msg.twist.linear.x = 0.0
+    velocity_msg.twist.linear.y = 0.0
+    velocity_msg.twist.linear.z = 0.0
+    velocity_msg.header.stamp = rospy.Time.now()
+    velocity_pub_2.publish(velocity_msg)
     
 
 def takeoff():
