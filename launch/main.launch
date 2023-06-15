@@ -1,3 +1,13 @@
 <launch>
-	<node pkg="uav" type="objectTracking.py" name="objectTracking" output="screen"/>
+    <!-- REFERENCE: find-object package -->
+    <arg name="teach" default="false"/>
+    <arg name="recognize" default="true"/>
+
+    <node name="find_object_2d" pkg="find-object" type="find_object_2d_node" output="screen">
+        <!-- Add any necessary parameters for find_object_2d -->
+        <param name="image_topic" value="webcam/image_raw" />
+        <!-- Add any other parameters as needed -->
+    </node>
+
+    <node pkg="uav" type="objectTracking.py" name="objectTracking" output="screen"/>
 </launch>
