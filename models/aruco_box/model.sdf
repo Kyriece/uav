@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<sdf version="1.4">
+  <model name="aruco_box">
+    <pose>2 0 0 0 0 0</pose>
+    <link name="box_link">
+      <collision name="box_collision">
+        <geometry>
+          <box>
+            <size>1 1 1</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="box_visual">
+        <geometry>
+          <box>
+            <size>1 1 1</size>
+          </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>model://aruco_box/materials/scripts</uri>
+            <uri>model://aruco_box/materials/textures</uri>
+            <name>MyMaterial</name>
+          </script>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

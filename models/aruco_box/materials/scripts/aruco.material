@@ -1,0 +1,14 @@
+material MyMaterial
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture marker.png
+        filtering anisotropic
+      }
+    }
+  }
+}
