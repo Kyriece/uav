@@ -17,9 +17,10 @@ import numpy as np
 current_state = State()
 velocity_pub = None
 takeoff_altitude = 5
+altitude = 0
 
 horizontal_speed = 0.5  # Horizontal speed when correcting position
-position_threshold = 40  # Position error threshold in pixels (since we don't have real-world measurements now)
+position_threshold = 15 * takeoff_altitude  # Position error threshold in pixels (since we don't have real-world measurements now)
 
 
 def state_cb(msg):
@@ -77,20 +78,20 @@ def centerObject(gray_image, marker_center):
     if abs(error_x) > position_threshold:
         if error_x > 0:
             print("Error X: Moving Left " + str(scaled_speed_x))
-            velocity.linear.x = scaled_speed_x
+            velocity.linear.x = -scaled_speed_x
         else:
             print("Error X: Moving Right " + str(scaled_speed_x))
-            velocity.linear.x = -scaled_speed_x
+            velocity.linear.x = scaled_speed_x
     else:
         velocity.linear.x = 0
 
     if abs(error_y) > position_threshold:
         if error_y > 0:
-            print("Error Y: Moving up" + str(error_y))
+            print("Error Y: Moving up" + str(scaled_speed_y))
             velocity.linear.y = scaled_speed_y
         else:
-            print("Error Y: Moving down " + str(error_y))
-            velocity.linear.y = scaled_speed_y
+            print("Error Y: Moving down " + str(scaled_speed_y))
+            velocity.linear.y = -scaled_speed_y
     else:
         velocity.linear.y = 0
     
@@ -100,6 +101,8 @@ def calculate_scaled_speed(error):
     if error > position_threshold:
         # Calculate the scaled speed within the range of 0 to maximum_speed
         scaled_speed = (error - position_threshold) / (horizontal_speed - position_threshold) * horizontal_speed
+        if abs(scaled_speed) > 0.6:
+            scaled_speed = 1
         return scaled_speed
     else:
         return 0.0
@@ -137,7 +140,7 @@ def listener():
     rospy.init_node('listener', anonymous=True)
     arm()
     takeoff()
-    rospy.Subscriber('/mavros/global_position/local', Odometry, callback)
+    # rospy.Subscriber('/mavros/global_position/local', Odometry, callback)
     image_sub = rospy.Subscriber("webcam/image_raw", Image, image_callback)
     rospy.spin()
 
