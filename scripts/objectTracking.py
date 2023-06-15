@@ -23,19 +23,19 @@ def callback(data):
     altitude = pose.position.z
     print(altitude)
 
+    if altitude > takeoff_altitude:
+        # Create a publisher for the velocity commands
+        velocity_pub = rospy.Publisher('/mavros/setpoint_velocity/cmd_vel', TwistStamped, queue_size=10)
 
-    # Create a publisher for the velocity commands
-    velocity_pub = rospy.Publisher('/mavros/setpoint_velocity/cmd_vel', TwistStamped, queue_size=10)
+        # Create a Twist message and set the linear and angular velocities
+        velocity_msg = TwistStamped()
+        velocity_msg.twist.linear.z = 1.0
 
-    # Create a Twist message and set the linear and angular velocities
-    velocity_msg = TwistStamped()
-    velocity_msg.twist.linear.z = 1.0
-
-    # Publish the velocity message repeatedly
-    rate = rospy.Rate(10)  # 10 Hz
-    velocity_msg.header.stamp = rospy.Time.now()
-    velocity_pub.publish(velocity_msg)
-    rate.sleep()
+        # Publish the velocity message repeatedly
+        rate = rospy.Rate(10)  # 10 Hz
+        velocity_msg.header.stamp = rospy.Time.now()
+        velocity_pub.publish(velocity_msg)
+        rate.sleep()
 
 def listener():
     rospy.init_node('listener', anonymous=True)
